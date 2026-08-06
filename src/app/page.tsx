@@ -47,6 +47,45 @@ export default function Home() {
         <UploadForm />
       </Card>
 
+      {/* Observability Guide & Pro Tips Section */}
+      <div className="max-w-4xl mx-auto space-y-4">
+        <div className="flex items-center gap-2 border-b border-slate-900 pb-3">
+          <History className="w-4 h-4 text-indigo-400" />
+          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider">
+            💡 Observability Best Practices: Getting the Most Out of Gemini
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="p-4 space-y-2 bg-slate-900/20 border-slate-900">
+            <div className="text-indigo-400 font-bold text-xs uppercase flex items-center gap-1.5">
+              <span>1. Enrich Trace Schemas</span>
+            </div>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Enrich your step objects with explicit <code className="text-indigo-300">tool</code>, <code className="text-indigo-300">input</code>, and <code className="text-indigo-300">output</code> properties. Gemini checks these values to identify functional loops, performance bottlenecks, and redundant logic.
+            </p>
+          </Card>
+
+          <Card className="p-4 space-y-2 bg-slate-900/20 border-slate-900">
+            <div className="text-cyan-400 font-bold text-xs uppercase flex items-center gap-1.5">
+              <span>2. Context Snapshotting</span>
+            </div>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Log raw system prompts or active compliance rulebooks directly into step arguments. This allows Gemini to evaluate legal safety constraints, capture compliance deviations, and flag active data leaks.
+            </p>
+          </Card>
+
+          <Card className="p-4 space-y-2 bg-slate-900/20 border-slate-900">
+            <div className="text-emerald-400 font-bold text-xs uppercase flex items-center gap-1.5">
+              <span>3. Logical Upgrades</span>
+            </div>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              For complex workflows exceeding 15 steps or involving deep state transitions, change the engine model inside <code className="text-emerald-300">gemini.ts</code> to <code className="text-emerald-300">gemini-1.5-pro</code> to leverage superior cross-document reasoning.
+            </p>
+          </Card>
+        </div>
+      </div>
+
       {/* Execution History Section */}
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="flex items-center justify-between border-b border-slate-900 pb-3">

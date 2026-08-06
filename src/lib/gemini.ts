@@ -10,11 +10,11 @@ const analysisSchema: any = {
     status: {
       type: "string",
       enum: ["approved", "needs_review", "blocked"],
-      description: "The governance status decision for this execution run."
+      description: "The governance status decision for this execution run based on developer safety and tool reliability."
     },
     summary: {
       type: "string",
-      description: "A detailed summary of what occurred in the execution, why it succeeded or failed, and key points of interest."
+      description: "A developer-oriented trace analysis detailing what parts of the execution succeeded, where debugging friction occurred, and how much session productivity was affected."
     },
     failure_step: {
       type: "integer",
@@ -22,24 +22,24 @@ const analysisSchema: any = {
     },
     risk_score: {
       type: "integer",
-      description: "Risk score from 0 (completely safe) to 100 (highly hazardous or broken)."
+      description: "Friction and runtime risk score from 0 (highly performant and clean) to 100 (heavily bottlenecked, broken, or loop-locked)."
     },
     confidence: {
       type: "number",
-      description: "The confidence level of the model in its audit, from 0.0 to 1.0."
+      description: "The confidence level of the model in its developer optimization audit, from 0.0 to 1.0."
     },
     unnecessary_steps: {
       type: "array",
       items: { type: "string" },
-      description: "List of steps or actions that were redundant, unnecessary, or loops."
+      description: "List of steps or API calls that were redundant, causing waste of local session time or unnecessary token consumption."
     },
     recommended_fix: {
       type: "string",
-      description: "Concrete engineering recommendation on how to avoid the failure or optimize the workflow."
+      description: "Concrete developer code refactoring recommendation, mock utilities, or structural optimizations to accelerate development velocity."
     },
     suggested_action: {
       type: "string",
-      description: "Suggested next operational action (e.g., 'Replay workflow.', 'Review compliance rules.', 'Deploy patch to pricing service.')"
+      description: "Suggested next engineering tool, SDK, or framework to integrate (e.g. 'Setup Mock Service Worker (MSW) to stub PricingAPI', 'Integrate Langsmith SDK for full state tracking', 'Cache CRM queries using an in-memory Redis cache')."
     }
   },
   required: [
@@ -76,30 +76,30 @@ function analyzeHeuristically(goal: string, steps: Step[]): GeminiAnalysis {
     const errorMsg = failedStep.error || "Unknown error";
     return {
       status: "needs_review",
-      summary: `The run failed at step ${failedStep.step} ('${failedStep.action}') with error: "${errorMsg}". The primary goal "${goal}" was not completed.`,
+      summary: `Execution failed at step ${failedStep.step} ('${failedStep.action}') with error: "${errorMsg}". This error blocks active developer session productivity. Total trace analysis indicates an opportunity to add mock endpoints or use standard SDK exception boundaries.`,
       failure_step: failedStep.step,
       risk_score: 75,
       confidence: 0.95,
-      unnecessary_steps: redundant.map(a => `Repeated action: '${a}'`),
-      recommended_fix: `Handle the exception in step ${failedStep.step} or add a retry/fallback mechanism for '${failedStep.action}'. Check system state or check parameter validation.`,
-      suggested_action: "Replay workflow with corrected inputs."
+      unnecessary_steps: redundant.map(a => `Repeated redundant action: '${a}'`),
+      recommended_fix: `Add a structured error boundary in your code around '${failedStep.action}'. To speed up local debugging without waiting for external API latency, use MSW (Mock Service Worker) or set up a local wiremock utility for '${failedStep.tool || "the service"}'.`,
+      suggested_action: "Integrate Langsmith or Langfuse SDK to automatically snapshot runtime variable states and inspect payload boundaries."
     };
   }
 
   // Success case
-  const unnecessary_steps_desc = redundant.map(a => `Action '${a}' was executed multiple times.`);
+  const unnecessary_steps_desc = redundant.map(a => `Action '${a}' was executed multiple times, creating a network/token bottleneck.`);
   const risk = redundant.length > 0 ? 25 : 10;
   return {
     status: "approved",
-    summary: `The workflow successfully completed all ${steps.length} steps. Goal "${goal}" was achieved. Total latency and throughput were optimal.`,
+    summary: `Successfully achieved goal "${goal}" in ${steps.length} steps. All code-paths ran optimally. However, developer productivity can be optimized further by streamlining dependency retrievals.`,
     failure_step: null,
     risk_score: risk,
     confidence: 0.90,
     unnecessary_steps: unnecessary_steps_desc,
     recommended_fix: redundant.length > 0
-      ? "Cache previous steps or retrieve dependencies once to avoid duplicate calls."
-      : "Excellent workflow efficiency. No architectural improvements required.",
-    suggested_action: "None. Execution is safe."
+      ? `To accelerate local development and reduce API latency, cache previous steps or implement a local cache (e.g. Redis/node-cache) for '${redundant[0]}'.`
+      : "Excellent trace efficiency. To further isolate integration logic, consider separating your integration hooks from the core orchestrator state machine.",
+    suggested_action: "Adopt a formal tool registry layout (like LangChain Tools or custom agent executors) to cleanly separate business logic from API integrations."
   };
 }
 
@@ -124,17 +124,21 @@ export async function analyzeExecution(goal: string, steps: Step[]): Promise<Gem
     } as any);
 
     const prompt = `
-      You are an elite autonomous agent auditor and governance platform.
-      Analyze this execution trace and audit its efficiency, correctness, and safety.
+      You are an elite autonomous agent developer-experience (DX) auditor and tooling architect.
+      Analyze this execution trace and audit its efficiency, correctness, and tooling opportunities.
+      Your goal is to show clear, actionable improvements for developers to speed up their development lifecycle,
+      improve local session productivity, reduce runtime latencies, and suggest specific developer tools,
+      tracing libraries, or mocking utilities they can work on/integrate.
       
       User Goal: "${goal}"
       
       Execution Steps:
       ${JSON.stringify(steps, null, 2)}
       
-      Please perform a deep structural review and output your evaluation matching the requested schema.
-      Focus on highlighting duplicate or loop steps, describing exactly where errors originated, 
-      calculating an accurate risk score (0-100), and prescribing clear, actionable engineering fixes.
+      Please perform a deep developer-centric review and output your evaluation matching the requested schema.
+      Focus on suggesting specific tools (like Langsmith, Langfuse, MSW, WireMock, Redis, Axios interceptors),
+      identifying redundant API/tool requests, proposing modular refactoring (e.g., separating core logic from tool hooks),
+      and prescribing direct, code-level optimizations that immediately 10x developer debugging productivity.
     `;
 
     const result = await model.generateContent(prompt);
