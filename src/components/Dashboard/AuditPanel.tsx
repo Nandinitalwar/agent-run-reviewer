@@ -4,6 +4,7 @@ import { GeminiAnalysis } from "@/lib/types";
 import { Badge } from "../UI/Badge";
 import { Button } from "../UI/Button";
 import { Card } from "../UI/Card";
+import { formatMarkdown } from "@/lib/format";
 
 interface AuditPanelProps {
   analysis: GeminiAnalysis;
@@ -77,9 +78,9 @@ export function AuditPanel({ analysis, onStatusChange }: AuditPanelProps) {
         {/* Audit Summary */}
         <div className="space-y-1">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Evaluation Summary</span>
-          <p className="text-sm text-slate-300 leading-relaxed bg-slate-950/40 p-3 rounded-lg border border-slate-900">
-            {analysis.summary}
-          </p>
+          <div className="bg-slate-950/40 p-3 rounded-lg border border-slate-900">
+            {formatMarkdown(analysis.summary)}
+          </div>
         </div>
 
         {/* Unnecessary Steps / Redundant Logic */}
@@ -104,9 +105,9 @@ export function AuditPanel({ analysis, onStatusChange }: AuditPanelProps) {
         {/* Prescribed Remedy */}
         <div className="space-y-1 bg-indigo-500/5 border border-indigo-500/10 p-3.5 rounded-lg">
           <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider block mb-1">Recommended Optimization</span>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            {analysis.recommended_fix}
-          </p>
+          <div className="text-xs text-slate-300 leading-relaxed space-y-1">
+            {formatMarkdown(analysis.recommended_fix)}
+          </div>
         </div>
 
         {/* Suggested Action */}

@@ -153,9 +153,9 @@ export function RunDashboard({ initialRun }: RunDashboardProps) {
           </span>
         </summary>
         <div className="p-4 border-t border-slate-900/60 bg-slate-950">
-          <pre className="text-xs font-mono text-slate-400 overflow-x-auto whitespace-pre leading-relaxed p-3 bg-[#070b13] rounded border border-slate-900">
-            {run.rawLog}
-          </pre>
+         <pre className="text-xs font-mono text-slate-400 overflow-x-auto whitespace-pre-wrap leading-relaxed p-3 bg-[#070b13] rounded border border-slate-900">
+           {run.rawLog}
+         </pre>
         </div>
       </details>
     </div>
