@@ -22,6 +22,9 @@ yarn-error.log*
 # Local Env Files
 .env*.local
 
+# Local traces
+/data/db.json
+
 # Vercel
 .vercel
 
